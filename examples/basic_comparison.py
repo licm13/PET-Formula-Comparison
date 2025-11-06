@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from pet_comparison.analysis import PETComparison
 from pet_comparison.analysis.visualization import (
@@ -17,6 +18,10 @@ from pet_comparison.analysis.visualization import (
     plot_correlation_matrix,
     plot_differences_heatmap,
 )
+
+# 设置输出目录
+OUTPUT_DIR = Path(__file__).parent / 'figures'
+OUTPUT_DIR.mkdir(exist_ok=True)
 
 
 def generate_synthetic_data(n_days=365):
@@ -139,31 +144,27 @@ def main():
     
     # Time series plot
     print("\n1. Time series comparison...")
-    fig1 = plot_timeseries(results_df, title="PET Formula Comparison - Time Series")
-    fig1.savefig('pet_timeseries.png', dpi=300, bbox_inches='tight')
+    fig1 = plot_timeseries(results_df, title="PET Formula Comparison - Time Series",
+                          save_path=OUTPUT_DIR / 'pet_timeseries.png')
     plt.close(fig1)
-    print("   Saved: pet_timeseries.png")
     
     # Box plot comparison
     print("2. Box plot comparison...")
-    fig2 = plot_box_comparison(results_df, title="PET Formula Distribution")
-    fig2.savefig('pet_boxplot.png', dpi=300, bbox_inches='tight')
+    fig2 = plot_box_comparison(results_df, title="PET Formula Distribution",
+                              save_path=OUTPUT_DIR / 'pet_boxplot.png')
     plt.close(fig2)
-    print("   Saved: pet_boxplot.png")
     
     # Correlation heatmap
     print("3. Correlation matrix...")
-    fig3 = plot_correlation_matrix(results_df, title="Correlation Between PET Formulas")
-    fig3.savefig('pet_correlation.png', dpi=300, bbox_inches='tight')
+    fig3 = plot_correlation_matrix(results_df, title="Correlation Between PET Formulas",
+                                  save_path=OUTPUT_DIR / 'pet_correlation.png')
     plt.close(fig3)
-    print("   Saved: pet_correlation.png")
     
     # Differences heatmap
     print("4. Differences heatmap...")
-    fig4 = plot_differences_heatmap(differences, title="Mean Absolute Differences")
-    fig4.savefig('pet_differences.png', dpi=300, bbox_inches='tight')
+    fig4 = plot_differences_heatmap(differences, title="Mean Absolute Differences (mm/day)",
+                                   save_path=OUTPUT_DIR / 'pet_differences.png')
     plt.close(fig4)
-    print("   Saved: pet_differences.png")
     
     print("\n" + "=" * 70)
     print("KEY FINDINGS")

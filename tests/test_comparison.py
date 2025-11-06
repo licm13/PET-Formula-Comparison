@@ -9,17 +9,18 @@ from pet_comparison.analysis import PETComparison
 
 
 def generate_test_data(n_days=30):
-    """Generate simple test data"""
+    """Generate simple test data with variation"""
     dates = pd.date_range(start='2020-01-01', periods=n_days, freq='D')
     
+    # Add some variation to ensure correlations are computable
     data = pd.DataFrame({
-        'temperature': np.ones(n_days) * 20.0,
-        'relative_humidity': np.ones(n_days) * 60.0,
-        'wind_speed': np.ones(n_days) * 2.5,
-        'net_radiation': np.ones(n_days) * 15.0,
-        'lai': np.ones(n_days) * 3.0,
-        'soil_moisture': np.ones(n_days) * 0.5,
-        'co2': np.ones(n_days) * 380.0,
+        'temperature': 20.0 + np.linspace(0, 10, n_days),  # 20-30°C
+        'relative_humidity': 60.0 + np.sin(np.linspace(0, 4*np.pi, n_days)) * 20.0,  # 40-80%
+        'wind_speed': 2.5 + np.cos(np.linspace(0, 2*np.pi, n_days)) * 1.0,  # 1.5-3.5 m/s
+        'net_radiation': 15.0 + np.sin(np.linspace(0, 2*np.pi, n_days)) * 5.0,  # 10-20 MJ/m²/day
+        'lai': 3.0 + np.linspace(0, 1, n_days),  # 3-4 LAI
+        'soil_moisture': 0.5 + np.sin(np.linspace(0, 3*np.pi, n_days)) * 0.2,  # 0.3-0.7
+        'co2': np.ones(n_days) * 380.0,  # Constant CO2
     }, index=dates)
     
     return data
