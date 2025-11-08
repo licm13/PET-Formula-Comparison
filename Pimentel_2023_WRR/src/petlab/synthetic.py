@@ -57,9 +57,9 @@ def make_pet_series(catchment: Catchment, met_df: pd.DataFrame, formula: str):
 
     # Vectorized computation using np.vectorize for compatibility
     # This is more efficient than explicit Python loops
-    compute_pet_vectorized = np.vectorize(
-        lambda d, tm, tx, tn: compute_daily_pet(formula, catchment.lat, int(d), tm, tx, tn)
-    )
+    def _daily_pet_calculator(d, tm, tx, tn):
+        return compute_daily_pet(formula, catchment.lat, int(d), tm, tx, tn)
+    compute_pet_vectorized = np.vectorize(_daily_pet_calculator)
 
     return compute_pet_vectorized(doy, tmean, tmax, tmin)
 
