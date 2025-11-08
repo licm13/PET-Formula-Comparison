@@ -329,18 +329,18 @@ pet_pm_rc = penman_monteith(
 
 print("  Computing PM-CO2 (CO2-aware Penman-Monteith)...")
 # For CO2-aware formula, we need to broadcast CO2 properly
-pet_pm_co2 = np.zeros_like(temp)
-for t in range(ntime):
-    pet_pm_co2[t] = penman_monteith_co2(
-        temperature=temp[t],
-        relative_humidity=rh[t],
-        wind_speed=ws[t],
-        net_radiation=rad[t],
-        pressure=pressure[t],
-        co2_concentration=co2_concentration[t],
-        co2_reference=355.0,  # 1991 baseline
-        surface_resistance=70.0
-    )
+# Broadcast the 1D CO2 array to match the 3D climate arrays
+co2_broadcasted = co2_concentration[:, np.newaxis, np.newaxis]
+pet_pm_co2 = penman_monteith_co2(
+    temperature=temp,
+    relative_humidity=rh,
+    wind_speed=ws,
+    net_radiation=rad,
+    pressure=pressure,
+    co2_concentration=co2_broadcasted,
+    co2_reference=355.0,  # 1991 baseline
+    surface_resistance=70.0
+)
 
 print("  Computing PM-Jarvis (Stomatal conductance model)...")
 # PM-Jarvis requires additional vegetation parameters
