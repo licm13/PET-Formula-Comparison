@@ -8,6 +8,17 @@ Notes:
 """
 from __future__ import annotations
 import numpy as np
+import sys
+import os
+
+# Import core physical functions from main library
+# 从主库导入核心物理函数，避免重复定义
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
+from pet_comparison.utils.constants import (
+    saturation_vapor_pressure,
+    slope_saturation_vapor_pressure,
+    get_psychrometric_constant,
+)
 
 LV = 2.45  # latent heat of vaporization [MJ kg-1]
 CP = 1.013e-3  # specific heat of air [MJ kg-1 K-1]
@@ -16,18 +27,29 @@ RHO_W = 1000.0  # water density kg m-3
 SEC_PER_DAY = 86400.0
 
 def _svp(t):
-    """Saturation vapor pressure (kPa) for temperature in °C (Tetens)."""
-    return 0.6108 * np.exp(17.27 * t / (t + 237.3))
+    """
+    Saturation vapor pressure (kPa) for temperature in °C (Tetens).
+    Note: Uses unified function from pet_comparison.utils.constants
+    """
+    return saturation_vapor_pressure(t)
 
 def _slope_svp(t):
-    """Slope of saturation vapor pressure curve Δ (kPa °C-1)."""
-    es = _svp(t)
-    return 4098 * es / (t + 237.3)**2
+    """
+    Slope of saturation vapor pressure curve Δ (kPa °C-1).
+    Note: Uses unified function from pet_comparison.utils.constants
+    """
+    return slope_saturation_vapor_pressure(t)
 
 def _gamma(ps):
-    """Psychrometric constant γ (kPa °C-1), ps in kPa (near-sfc)."""
-    # γ = Cp * P / (ε * λ)
-    return CP * ps / (EPS * LV)
+    """
+    Psychrometric constant γ (kPa °C-1), ps in kPa (near-sfc).
+    Note: Uses unified function from pet_comparison.utils.constants
+    """
+    # The central `get_psychrometric_constant` function requires a temperature
+    # argument, but its current implementation ignores it. A nominal value is
+    # used here to satisfy the function signature.
+    T_NOMINAL_FOR_GAMMA = 20.0
+    return get_psychrometric_constant(ps, T_NOMINAL_FOR_GAMMA)
 
 def pm_rc(tas, rh, ps, u2, Rn, G):
     """

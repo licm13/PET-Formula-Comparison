@@ -1,20 +1,33 @@
 import math
+import sys
+import os
 from typing import Optional, Sequence
+
+# Import core physical functions from main library
+# 从主库导入核心物理函数，避免重复定义
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
+from pet_comparison.utils.constants import (
+    saturation_vapor_pressure,
+    slope_saturation_vapor_pressure,
+)
 
 def saturation_vapor_pressure_kpa(T_C: float) -> float:
     """
     饱和水汽压 (Tetens, kPa). Units per FAO-56.
     es = 0.6108 * exp(17.27 * T / (T + 237.3))
+
+    Note: Uses unified function from pet_comparison.utils.constants
     """
-    return 0.6108 * math.exp(17.27 * T_C / (T_C + 237.3))
+    return saturation_vapor_pressure(T_C)
 
 def slope_svp_kpa_per_C(T_C: float) -> float:
     """
     Δ: 饱和水汽压-温度曲线斜率 (kPa/°C). FAO-56
     Δ = 4098 * es / (T + 237.3)^2
+
+    Note: Uses unified function from pet_comparison.utils.constants
     """
-    es = saturation_vapor_pressure_kpa(T_C)
-    return 4098.0 * es / ((T_C + 237.3) ** 2)
+    return slope_saturation_vapor_pressure(T_C)
 
 def vpd_from_T_RH(T_C: float, RH: float) -> float:
     """

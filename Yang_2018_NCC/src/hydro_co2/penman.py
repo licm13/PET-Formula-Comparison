@@ -13,6 +13,18 @@ All formulas follow Yang et al. (2018) Methods, FAO-56, and Shuttleworth (1993).
 
 from __future__ import annotations
 import numpy as np
+import sys
+import os
+
+# Import core physical functions from main library
+# 从主库导入核心物理函数，避免重复定义
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
+from pet_comparison.utils.constants import (
+    saturation_vapor_pressure as _svp_kpa,
+    slope_saturation_vapor_pressure as _slope_svp_kpa,
+    get_psychrometric_constant as _gamma_kpa,
+    get_latent_heat as _latent_heat_mj
+)
 
 # --- Physical constants (常数)
 CP = 1004.0          # J kg^-1 K^-1, specific heat of air at constant pressure  空气定压比热
@@ -25,32 +37,44 @@ def latent_heat(T):
     """
     Latent heat of vaporization λ (J kg^-1), function of air temperature T (°C).
     潜热 λ，随气温 T (°C) 的函数。FAO 常用线性近似。
+
+    Note: Uses unified function from pet_comparison.utils.constants
     """
-    return (2.501 - 0.002361 * T) * 1e6  # J/kg
+    return _latent_heat_mj(T) * 1e6  # Convert MJ/kg to J/kg
 
 def saturation_vapor_pressure(T):
     """
     Saturation vapor pressure es(T) in Pa (Tetens-like).
     饱和水汽压 es，单位 Pa。
+
+    Note: Uses unified function from pet_comparison.utils.constants
     """
-    # es in kPa per FAO56: 0.6108 * exp(17.27 T/(T+237.3)); convert to Pa
-    es_kPa = 0.6108 * np.exp(17.27 * T / (T + 237.3))
-    return es_kPa * 1000.0
+    # Main library returns kPa, convert to Pa
+    return _svp_kpa(T) * 1000.0
 
 def slope_svp(T):
     """
     s = d(es)/dT in Pa K^-1, saturation vapor pressure slope wrt T.
     饱和水汽压曲线斜率 s，单位 Pa/K。
+
+    Note: Uses unified function from pet_comparison.utils.constants
     """
-    es = saturation_vapor_pressure(T)
-    return (4098.0 * (es / 1000.0)) / ((T + 237.3) ** 2) * 1000.0  # back to Pa/K
+    # Main library returns kPa/°C, convert to Pa/K
+    return _slope_svp_kpa(T) * 1000.0
 
 def psychrometric_constant(P=P0, lambda_Jkg=2.45e6):
     """
     Psychrometric constant γ in Pa K^-1.
     心理常数 γ（Pa/K）。FAO56 常用：γ = Cp * P / (ε λ)
+
+    Note: Uses unified function from pet_comparison.utils.constants
     """
-    return CP * P / (EPS * lambda_Jkg)
+    # Convert P from Pa to kPa for main library function
+    P_kpa = P / 1000.0
+    # A nominal temperature is passed to satisfy the function signature, though it is currently unused.
+    T_nominal = 20.0
+    # Main library returns kPa/°C, convert to Pa/K
+    return _gamma_kpa(P_kpa, T_nominal) * 1000.0
 
 def air_density(P=P0, T=20.0, RH=0.5):
     """

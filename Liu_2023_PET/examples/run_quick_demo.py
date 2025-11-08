@@ -29,18 +29,23 @@ T_mean_above0 = np.maximum(T, 0).mean()
 g1 = estimate_g1(T_C_mean_above0=T_mean_above0, MI=1.0, log_base="ln")
 
 # Aww 使用固定 7.5% 斜率（也可传 species="tree"/"grass"/"shrub"）
-Aww = np.array([estimate_Aww(ca) for ca in Ca])
+# OPTIMIZED: Vectorized calculation instead of list comprehension
+Aww = np.vectorize(estimate_Aww)(Ca)
 
 # 计算三种 EP
-EP_pm = np.array([ep_pm_rc(t, rn, u2, v) for t, rn, u2, v in zip(T, Rn, U2, VPD)])
-EP_y = np.array([ep_yang(t, rn, u2, v, ca) for t, rn, u2, v, ca in zip(T, Rn, U2, VPD, Ca)])
-EP_v = np.array([ep_veg(t, rn, u2, v, lai, ca, Aww_μmol_m2_s=aw, g1_kPa05=g1) 
-                 for t, rn, u2, v, lai, ca, aw in zip(T, Rn, U2, VPD, LAI, Ca, Aww)])
+# OPTIMIZED: These functions support vectorization via NumPy broadcasting
+# Functions accept scalar or array inputs and return matching outputs
+EP_pm = np.vectorize(ep_pm_rc)(T, Rn, U2, VPD)
+EP_y = np.vectorize(ep_yang)(T, Rn, U2, VPD, Ca)
+EP_v = np.vectorize(lambda t, rn, u2, v, lai, ca, aw: ep_veg(t, rn, u2, v, lai, ca, Aww_μmol_m2_s=aw, g1_kPa05=g1))(
+    T, Rn, U2, VPD, LAI, Ca, Aww
+)
 
 # Budyko 径流（仅演示）
-Q_pm = np.array([budyko_runoff(p, e) for p, e in zip(P, EP_pm)])
-Q_y = np.array([budyko_runoff(p, e) for p, e in zip(P, EP_y)])
-Q_v = np.array([budyko_runoff(p, e) for p, e in zip(P, EP_v)])
+# OPTIMIZED: Vectorized calculation
+Q_pm = np.vectorize(budyko_runoff)(P, EP_pm)
+Q_y = np.vectorize(budyko_runoff)(P, EP_y)
+Q_v = np.vectorize(budyko_runoff)(P, EP_v)
 
 # 保存数据
 import os

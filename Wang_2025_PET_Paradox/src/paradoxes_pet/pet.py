@@ -2,7 +2,7 @@
 
 """
 PET formulas used in the "Three Paradoxes" paper (teaching re-implementation).
-基于“三大悖论”论文的 PET 公式（教学演示版）。
+基于"三大悖论"论文的 PET 公式（教学演示版）。
 Note: Units are important — see each function docstring.
 注意：单位非常重要——请查阅函数文档。
 
@@ -15,6 +15,16 @@ This module avoids external dependencies beyond numpy.
 """
 from __future__ import annotations
 import numpy as np
+import sys
+import os
+
+# Import core physical functions from main library
+# 从主库导入核心物理函数，避免重复定义
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
+from pet_comparison.utils.constants import (
+    saturation_vapor_pressure,
+    slope_saturation_vapor_pressure,
+)
 
 # --- Physical constants / 物理常数 ---
 # Psychrometric constant gamma typically ~ 0.066 kPa/°C (depends on pressure, here fixed for demo)
@@ -26,17 +36,19 @@ def saturation_vapor_pressure_kpa(Ta_C: np.ndarray) -> np.ndarray:
     """
     Saturation vapor pressure (kPa) at air temperature Ta (°C).
     饱和水汽压公式 (kPa)，输入空气温度 (°C)。
+
+    Note: Uses unified function from pet_comparison.utils.constants
     """
-    # Tetens formula-like
-    return 0.6108 * np.exp(17.27 * Ta_C / (Ta_C + 237.3))
+    return saturation_vapor_pressure(Ta_C)
 
 def slope_svp_kpa_per_C(Ta_C: np.ndarray) -> np.ndarray:
     """
     Slope of saturation vapor pressure curve (kPa/°C).
     饱和水汽压曲线斜率 (kPa/°C)。
+
+    Note: Uses unified function from pet_comparison.utils.constants
     """
-    es = saturation_vapor_pressure_kpa(Ta_C)
-    return 4098.0 * es / (Ta_C + 237.3) ** 2
+    return slope_saturation_vapor_pressure(Ta_C)
 
 def pm_rc_pet_mm_day(
     Ta_C: np.ndarray,
