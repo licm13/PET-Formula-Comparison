@@ -45,9 +45,11 @@ def _gamma(ps):
     Psychrometric constant γ (kPa °C-1), ps in kPa (near-sfc).
     Note: Uses unified function from pet_comparison.utils.constants
     """
-    # Use nominal temperature for consistency
-    T_nominal = 20.0
-    return get_psychrometric_constant(ps, T_nominal)
+    # The central `get_psychrometric_constant` function requires a temperature
+    # argument, but its current implementation ignores it. A nominal value is
+    # used here to satisfy the function signature.
+    T_NOMINAL_FOR_GAMMA = 20.0
+    return get_psychrometric_constant(ps, T_NOMINAL_FOR_GAMMA)
 
 def pm_rc(tas, rh, ps, u2, Rn, G):
     """
