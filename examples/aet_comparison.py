@@ -20,7 +20,7 @@ import pandas as pd
 import xarray as xr
 
 # Import AET models from the refactored framework
-from py_et_lib.models import GLEAM, MOD16, PTJPL, PMLv2, SEBAL, SSEBop
+from py_et_lib.models import GLEAM, MOD16, PTJPL, PMLv2, SSEBop
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
