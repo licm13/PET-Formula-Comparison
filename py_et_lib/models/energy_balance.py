@@ -25,8 +25,8 @@ class SEBAL(EnergyBalanceBase):
         lst = ds["LST"]
         ra = ds["ra"].clip(min=1.0)
 
-        hot_mask = lst >= lst.quantile(0.95, dim="time", skipna=True)
-        cold_mask = lst <= lst.quantile(0.05, dim="time", skipna=True)
+        hot_mask = lst >= lst.quantile(0.95, dim=["lat", "lon"], skipna=True)
+        cold_mask = lst <= lst.quantile(0.05, dim=["lat", "lon"], skipna=True)
 
         rn_hot = ds["Rn"].where(hot_mask).mean(dim="time")
         g_hot = ds["G"].where(hot_mask).mean(dim="time")
