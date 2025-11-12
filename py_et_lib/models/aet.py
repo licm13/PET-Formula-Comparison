@@ -229,33 +229,8 @@ class PMLv2(PenmanMonteithBase):
         xr.Dataset
             Dataset containing 'AET' variable in mm/day
         """
-        ensure_variables(ds, {"Rn", "G", "T_mean"})
-
-        delta = _slope_svp_curve(ds["T_mean"])
-        gamma = CONSTANTS["GAMMA"]
-        rho = CONSTANTS["RHO_AIR"]
-        cp = CONSTANTS["CP_AIR"]
-
-        ga = self.params.get("ga", 0.01)  # aerodynamic conductance [m/s]
-        gc = self._compute_canopy_conductance(ds)
-
-        vpd = ds.get(
-            "VPD",
-            _vpd_from_rh(
-                ds["T_mean"],
-                ds.get("RH", xr.zeros_like(ds["T_mean"]) + 60),
-            ),
-        )
-
-        ac = ds["Rn"] * 0.6
-        as_ = ds["Rn"] * 0.4
-
-        le_c = (delta * ac + rho * cp * vpd * ga) / (delta + gamma * (1.0 + ga / gc))
-        soil_factor = self.params.get("soil_factor", 0.8)
-        le_s = soil_factor * delta * as_ / (delta + gamma)
-        le_total = le_c + le_s
-
-        aet = le_total / CONSTANTS["LAMBDA_VAP"] * 86400 / 1e6
+        components = self.partition_components(ds)
+        aet = components["transpiration"] + components["soil_evaporation"]
         return xr.Dataset({"AET": aet.rename("AET")})
 
     def partition_components(self, ds: xr.Dataset) -> xr.Dataset:
