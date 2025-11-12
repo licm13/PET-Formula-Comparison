@@ -13,8 +13,7 @@ def _saturation_vapour_pressure(temp_c: xr.DataArray) -> xr.DataArray:
 
 
 def _slope_svp_curve(temp_c: xr.DataArray) -> xr.DataArray:
-    es = _saturation_vapour_pressure(temp_c)
-    return 4098 * es / (temp_c + 237.3) ** 2
+    return 4098 * _saturation_vapour_pressure(temp_c) / (temp_c + 237.3) ** 2
 
 
 def _mean_saturation_vapour_pressure(tmax: xr.DataArray, tmin: xr.DataArray) -> xr.DataArray:
