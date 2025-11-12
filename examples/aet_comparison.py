@@ -184,9 +184,10 @@ def run_aet_models(ds: xr.Dataset) -> dict:
     ssebop = SSEBop()
     try:
         results["SSEBop"] = ssebop.compute_et(ds)["AET"]
-    except Exception as e:
+    # SSEBop is expected to fail with 1D synthetic data due to lack of spatial dimensions
+    # required by SEBAL's hot/cold pixel approach. Catch only expected exceptions.
+    except (ValueError, KeyError) as e:
         print(f"    Warning: SSEBop failed ({e}), skipping...")
-
     print(f"\nSuccessfully ran {len(results)} models.")
     return results
 
