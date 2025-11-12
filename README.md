@@ -1,26 +1,52 @@
-# PET Formula Comparison: An Integrated Scientific Framework
+# ET Formula Comparison: A Unified AET and PET Framework
 
-**潜在蒸散发公式对比：整合科学框架**
+**蒸散发公式对比：统一的 AET 和 PET 框架**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-A comprehensive, production-ready framework for comparing Potential Evapotranspiration (PET) formulas, integrating methods from six landmark scientific papers into a unified library.
+A comprehensive, production-ready framework for comparing both Actual Evapotranspiration (AET) and Potential Evapotranspiration (PET) models, organized by algorithm families and integrating methods from landmark scientific papers.
 
-一个全面的、可用于生产的潜在蒸散发(PET)公式对比框架，将六篇标志性科学论文的方法整合到统一的库中。
+一个全面的、可用于生产的蒸散发对比框架，包含实际蒸散发(AET)和潜在蒸散发(PET)模型，按算法家族组织，整合了标志性科学论文的方法。
 
 ---
 
 ## 🎯 Project Overview / 项目概述
 
-This framework unifies **20+ PET formulas** spanning classic methods, temperature-based approaches, radiation-based models, and advanced vegetation/CO2-aware algorithms. It is designed for:
+This framework provides a **unified comparison platform** for evapotranspiration models spanning multiple algorithm families:
 
-本框架统一了 **20+ PET 公式**，涵盖经典方法、基于温度的方法、基于辐射的模型以及高级植被/CO2感知算法。设计用于：
+本框架提供了一个 **统一的对比平台**，涵盖多个算法家族的蒸散发模型：
 
-- **Systematic formula comparison** under identical forcing conditions / 相同强迫条件下的系统公式对比
-- **Climate change impact assessment** with CO2 sensitivity / 具有CO2敏感性的气候变化影响评估
-- **Vegetation-atmosphere interaction studies** / 植被-大气相互作用研究
-- **High-impact publication** targeting Nature Water, Nature Climate Change, WRR, etc. / 针对Nature Water、Nature Climate Change、WRR等的高影响力发表
+### AET Models (Actual Evapotranspiration) / AET 模型（实际蒸散发）
+
+Organized by algorithm family following the classification from recent scientific literature:
+
+按照最新科学文献的分类方法，按算法家族组织：
+
+1. **Penman-Monteith (P-M) Resistance Models** / **彭曼-蒙蒂斯阻力模型**
+   - Physical-based models treating ET as driven by energy gradients and limited by resistances
+   - 基于物理的模型，将ET视为由能量梯度驱动并受阻力限制的过程
+
+2. **Priestley-Taylor (P-T) Stress Models** / **普里斯特利-泰勒胁迫模型**
+   - Radiation-based potential ET reduced by stress factors (water, temperature, vegetation)
+   - 基于辐射的潜在ET，由胁迫因子（水分、温度、植被）降低
+
+3. **Surface Energy Balance (SEB) Residual Models** / **地表能量平衡残差模型**
+   - Thermal-based models estimating ET as residual of energy balance using satellite LST
+   - 基于热红外的模型，使用卫星地表温度将ET估算为能量平衡的残差
+
+### PET Models (Potential Evapotranspiration) / PET 模型（潜在蒸散发）
+
+- **20+ PET formulas** spanning temperature-based, radiation-based, and CO2/vegetation-aware approaches
+- **20+ PET 公式**，涵盖基于温度、基于辐射和CO2/植被感知的方法
+
+### Design Goals / 设计目标
+
+- **Systematic comparison** under identical forcing conditions / 相同强迫条件下的系统对比
+- **Algorithm family organization** for clear conceptual understanding / 按算法家族组织以清晰理解概念
+- **Component partitioning** (transpiration vs. evaporation) where applicable / 组分拆分（蒸腾vs.蒸发）
+- **Climate change studies** with CO2 sensitivity / 具有CO2敏感性的气候变化研究
+- **High-impact publication** targeting Nature Water, Nature Climate Change, WRR, etc. / 针对高影响力期刊发表
 
 ---
 
@@ -70,6 +96,64 @@ This framework consolidates methodologies from:
 
 - **Dryness Index**: PET/P theoretical distributions / PET/P理论分布
 - **Power-law tails**: Aridity distribution analysis / 幂律尾：干旱分布分析
+
+---
+
+## 📊 ET Algorithm Family Classification / ET 算法家族分类
+
+### Understanding Algorithm Families / 理解算法家族
+
+The diversity of global ET products can be organized into distinct **algorithm families** based on their core computational approach. This classification provides a conceptual framework for understanding model similarities, differences, and appropriate applications.
+
+全球ET产品的多样性可以根据其核心计算方法组织成不同的 **算法家族**。这种分类为理解模型的相似性、差异性和适当应用提供了概念框架。
+
+### Complete Model Inventory / 完整模型清单
+
+#### AET Models / 实际蒸散发模型
+
+| **Model** | **Algorithm Family** | **Core Method** | **Component Partitioning** | **Key Reference** |
+|-----------|---------------------|-----------------|---------------------------|-------------------|
+| **MOD16** | Penman-Monteith | P-M with biome-specific resistance (BPLUT) | Internal only | Mu et al. (2011) |
+| **PMLv2** | Penman-Monteith | Two-source P-M-Leuning with GPP coupling | ✓ T, E | Zhang et al. (2019) |
+| **PTJPL** | Priestley-Taylor | P-T with eco-physiological constraints | ✓ Ei, Es, T | Fisher et al. (2008) |
+| **GLEAM** | Priestley-Taylor | P-T with microwave soil moisture stress | Partial | Martens et al. (2017) |
+| **SEBAL** | Energy Balance | Hot/cold pixel self-calibration | ✗ | Bastiaanssen et al. (1998) |
+| **SSEBop** | Energy Balance | Thermal-based with ET₀ | ✗ | Senay et al. (2013) |
+
+**Component Legend / 组分图例:**
+- T: Transpiration / 蒸腾
+- E/Es: Soil Evaporation / 土壤蒸发
+- Ei: Interception Evaporation / 冠层截留蒸发
+- ✓: Explicitly available / 显式可用
+- ✗: Not available / 不可用
+
+#### PET Models / 潜在蒸散发模型
+
+**Temperature-Based / 基于温度**
+| Formula | Data Requirements | Complexity | Use Case |
+|---------|-------------------|------------|----------|
+| Jensen-Haise | T, Ra | Low | Data-limited regions |
+| Hargreaves | Tmax, Tmin, Ra | Low | Minimal data availability |
+| Oudin | T, Ra | Low | PDSI, hydrological modeling |
+
+**Radiation-Based / 基于辐射**
+| Formula | Data Requirements | Complexity | Use Case |
+|---------|-------------------|------------|----------|
+| Priestley-Taylor | T, Rn | Medium | Energy-limited conditions |
+| Yang-Roderick | T, Rn | Medium | Water balance studies |
+
+**Combination Methods / 组合方法**
+| Formula | Data Requirements | Complexity | Use Case |
+|---------|-------------------|------------|----------|
+| Penman-Monteith (FAO-56) | T, RH, WS, Rn | High | Reference ET standard |
+| PML | T, RH, WS, Rn, LAI | High | Remote sensing applications |
+
+**CO2/Vegetation-Aware / CO2/植被感知**
+| Formula | Data Requirements | Complexity | Use Case |
+|---------|-------------------|------------|----------|
+| PM-CO2 | T, RH, WS, Rn, CO2 | High | Climate change studies |
+| EP_Veg | T, Rn, WS, VPD, LAI, CO2 | High | Vegetation dynamics |
+| PM-Jarvis | T, Rn, WS, VPD, Sg, CO2 | High | Stomatal response analysis |
 
 ---
 
@@ -161,7 +245,108 @@ pip install -e .
 
 ## 💡 Quick Start / 快速开始
 
-### Example 1: Basic Formula Comparison / 基本公式对比
+### Example 1: AET Model Comparison / 实际蒸散发模型对比
+
+```python
+import numpy as np
+import pandas as pd
+import xarray as xr
+import matplotlib.pyplot as plt
+from py_et_lib.models import MOD16, PMLv2, PTJPL, GLEAM
+
+# Generate synthetic forcing data / 生成合成强迫数据
+dates = pd.date_range('2020-01-01', periods=365, freq='D')
+day_of_year = np.arange(365)
+
+# Create xarray Dataset with required variables / 创建包含所需变量的xarray数据集
+ds = xr.Dataset({
+    'T_mean': (['time'], 15 + 12 * np.sin(2 * np.pi * day_of_year / 365)),
+    'T_max': (['time'], 20 + 12 * np.sin(2 * np.pi * day_of_year / 365)),
+    'Rn': (['time'], 150 + 100 * np.sin(2 * np.pi * day_of_year / 365)),
+    'G': (['time'], np.ones(365) * 10),
+    'RH': (['time'], 65 - 15 * np.sin(2 * np.pi * day_of_year / 365)),
+    'VPD': (['time'], 1.0 + 0.5 * np.sin(2 * np.pi * day_of_year / 365)),
+    'u2': (['time'], 2.5 + 0.5 * np.random.randn(365)),
+    'LAI': (['time'], 3.0 + 1.5 * np.sin(2 * np.pi * day_of_year / 365)),
+    'fAPAR': (['time'], 0.5 + 0.3 * np.sin(2 * np.pi * day_of_year / 365)),
+    'fIPAR': (['time'], 0.6 + 0.3 * np.sin(2 * np.pi * day_of_year / 365)),
+    'soil_moisture': (['time'], 0.4 + 0.2 * np.sin(2 * np.pi * day_of_year / 365)),
+}, coords={'time': dates})
+
+# Run AET models from different algorithm families / 运行不同算法家族的AET模型
+print("Running AET models...")
+
+# Penman-Monteith family / 彭曼-蒙蒂斯家族
+mod16 = MOD16(bplut_params={})
+aet_mod16 = mod16.compute_et(ds)['AET']
+
+pmlv2 = PMLv2()
+aet_pmlv2 = pmlv2.compute_et(ds)['AET']
+
+# Priestley-Taylor family / 普里斯特利-泰勒家族
+ptjpl = PTJPL(T_opt=25.0, fAPAR_max=0.95)
+aet_ptjpl = ptjpl.compute_et(ds)['AET']
+
+gleam = GLEAM(soil_moisture_max=0.5)
+aet_gleam = gleam.compute_et(ds)['AET']
+
+# Plot comparison / 绘制对比图
+plt.figure(figsize=(12, 6))
+plt.plot(dates, aet_mod16, label='MOD16 (P-M)', linewidth=2)
+plt.plot(dates, aet_pmlv2, label='PMLv2 (P-M)', linewidth=2, linestyle='--')
+plt.plot(dates, aet_ptjpl, label='PTJPL (P-T)', linewidth=2)
+plt.plot(dates, aet_gleam, label='GLEAM (P-T)', linewidth=2, linestyle='--')
+plt.xlabel('Date')
+plt.ylabel('AET (mm/day)')
+plt.title('AET Model Comparison by Algorithm Family')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('aet_comparison.png', dpi=300)
+print("Saved: aet_comparison.png")
+
+# Print statistics / 打印统计信息
+print(f"\nMean AET (mm/day):")
+print(f"  MOD16: {float(aet_mod16.mean()):.2f}")
+print(f"  PMLv2: {float(aet_pmlv2.mean()):.2f}")
+print(f"  PTJPL: {float(aet_ptjpl.mean()):.2f}")
+print(f"  GLEAM: {float(aet_gleam.mean()):.2f}")
+```
+
+### Example 2: Component Partitioning / 组分拆分
+
+```python
+# Get transpiration and evaporation components from PMLv2 / 从PMLv2获取蒸腾和蒸发组分
+pmlv2 = PMLv2()
+components = pmlv2.partition_components(ds)
+
+transp = components['transpiration']
+soil_evap = components['soil_evaporation']
+
+# Calculate T/ET ratio / 计算T/ET比率
+total_et = transp + soil_evap
+t_et_ratio = transp / total_et
+
+print(f"\nPMLv2 Component Analysis:")
+print(f"  Mean Transpiration: {float(transp.mean()):.2f} mm/day")
+print(f"  Mean Soil Evaporation: {float(soil_evap.mean()):.2f} mm/day")
+print(f"  Mean T/ET Ratio: {t_et_ratio.mean():.2%}")
+
+# Plot stacked components / 绘制堆叠组分图
+plt.figure(figsize=(12, 6))
+plt.fill_between(dates, 0, transp, label='Transpiration', alpha=0.7)
+plt.fill_between(dates, transp, transp + soil_evap, label='Soil Evaporation', alpha=0.7)
+plt.xlabel('Date')
+plt.ylabel('ET Components (mm/day)')
+plt.title('PMLv2 ET Component Partitioning')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('pmlv2_components.png', dpi=300)
+print("Saved: pmlv2_components.png")
+```
+
+### Example 3: PET Formula Comparison / 潜在蒸散发公式对比
 
 ```python
 import pandas as pd
