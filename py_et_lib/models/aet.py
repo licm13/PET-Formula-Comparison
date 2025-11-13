@@ -116,7 +116,7 @@ class MOD16(PenmanMonteithBase):
 
         soil_moisture = ds.get("soil_moisture", xr.zeros_like(ds["Rn"]) + 0.2)
         soil_moisture_max = ds.get("soil_moisture_max", xr.zeros_like(soil_moisture) + 0.4)
-        soil_stress = xr.clip(soil_moisture / soil_moisture_max, 0.05, 1.0)
+        soil_stress = (soil_moisture / soil_moisture_max).clip(0.05, 1.0)
         r_soil = 500.0 / soil_stress
 
         r_s = wet_canopy * 50.0 + (1.0 - wet_canopy) * (r_c + r_soil)
@@ -329,7 +329,7 @@ class PTJPL(PriestleyTaylorBase):
     def _calc_f_sm(vpd: xr.DataArray, rh_min: xr.DataArray) -> xr.DataArray:
         """Calculate soil moisture constraint factor."""
         beta = 2.0
-        return xr.clip(rh_min / (vpd / beta + 1e-6), 0.0, 1.0)
+        return (rh_min / (vpd / beta + 1e-6)).clip(0.0, 1.0)
 
     @staticmethod
     def _calc_f_c(fapar: xr.DataArray, fipar: xr.DataArray) -> xr.DataArray:
@@ -344,7 +344,7 @@ class PTJPL(PriestleyTaylorBase):
     def _calc_f_m(self, fapar: xr.DataArray) -> xr.DataArray:
         """Calculate plant moisture constraint factor."""
         fapar_max = self.params["fAPAR_max"]
-        return xr.clip(fapar / fapar_max, 0.0, 1.0)
+        return (fapar / fapar_max).clip(0.0, 1.0)
 
     def compute_et(self, ds: xr.Dataset) -> xr.Dataset:
         """Compute actual evapotranspiration.
@@ -472,7 +472,7 @@ class GLEAM(PriestleyTaylorBase):
         """
         ensure_variables(ds, {"soil_moisture"})
         sm_max = self.params["soil_moisture_max"]
-        return xr.clip(ds["soil_moisture"] / sm_max, 0.0, 1.0)
+        return (ds["soil_moisture"] / sm_max).clip(0.0, 1.0)
 
     def compute_et(self, ds: xr.Dataset) -> xr.Dataset:
         """Compute actual evapotranspiration.

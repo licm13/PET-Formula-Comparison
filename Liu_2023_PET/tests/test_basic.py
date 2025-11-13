@@ -1,4 +1,10 @@
+import sys
+import os
 import math
+
+# Add the src directory to the path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
 from ep_veg import ep_pm_rc, ep_yang, ep_veg
 from ep_veg import estimate_g1, estimate_Aww
 

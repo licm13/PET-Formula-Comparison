@@ -31,7 +31,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pet_comparison.formulas.penman_monteith import penman_monteith
 from pet_comparison.formulas.penman_monteith_jarvis import penman_monteith_jarvis
 from pet_comparison.formulas.priestley_taylor_jpl import priestley_taylor_jpl
-from pet_comparison.formulas.co2_aware import penman_monteith_co2
+from pet_comparison.formulas.co2_aware import pm_co2_aware
+from pet_comparison.utils.constants import vapor_pressure_deficit
 
 # Import PDSI for drought analysis
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '../Xiong_PDSI_025'))
@@ -331,15 +332,13 @@ print("  Computing PM-CO2 (CO2-aware Penman-Monteith)...")
 # For CO2-aware formula, we need to broadcast CO2 properly
 # Broadcast the 1D CO2 array to match the 3D climate arrays
 co2_broadcasted = co2_concentration[:, np.newaxis, np.newaxis]
-pet_pm_co2 = penman_monteith_co2(
+pet_pm_co2 = pm_co2_aware(
     temperature=temp,
     relative_humidity=rh,
     wind_speed=ws,
     net_radiation=rad,
-    pressure=pressure,
-    co2_concentration=co2_broadcasted,
-    co2_reference=355.0,  # 1991 baseline
-    surface_resistance=70.0
+    co2=co2_broadcasted,
+    pressure=pressure
 )
 
 print("  Computing PM-Jarvis (Stomatal conductance model)...")
@@ -349,25 +348,27 @@ lai = np.where(land_cover == 1, 5.0,  # Forest
        np.where(land_cover == 2, 3.0,  # Cropland
        np.where(land_cover == 3, 1.5, 0.5)))  # Grassland, Urban
 
+# Calculate vapor pressure deficit
+vpd = vapor_pressure_deficit(temp, relative_humidity=rh)
+
 # Broadcast the 1D CO2 array to match the 3D climate arrays
 co2_broadcasted = co2_concentration[:, np.newaxis, np.newaxis]
 pet_pm_jarvis = penman_monteith_jarvis(
     temperature=temp,
-    relative_humidity=rh,
+    vpd=vpd,
     wind_speed=ws,
     net_radiation=rad,
     solar_radiation=rad * 0.6,  # Approximate shortwave
-    pressure=pressure,
-    co2_concentration=co2_broadcasted,
-    lai=lai
+    co2_ppm=co2_broadcasted,
+    lai=lai,
+    pressure=pressure
 )
 
 print("  Computing PT-JPL (Priestley-Taylor JPL)...")
 pet_pt_jpl = priestley_taylor_jpl(
     temperature=temp,
     net_radiation=rad,
-    pressure=pressure,
-    relative_humidity=rh
+    pressure=pressure
 )
 
 # Add PET results to dataset
@@ -563,7 +564,7 @@ for idx, (pet_var, label) in enumerate(zip(pet_formulas, labels)):
     zone_labels = [zone_names[z] for z in range(1, 5)]
 
     # Create boxplot
-    bp = ax.boxplot(data_for_plot, labels=zone_labels, patch_artist=True,
+    bp = ax.boxplot(data_for_plot, tick_labels=zone_labels, patch_artist=True,
                     showmeans=True, meanline=True)
 
     # Color boxes
@@ -672,7 +673,8 @@ EP_adjusted = pet_pm_jarvis * days_per_month_full[:, None, None]  # PM-Jarvis (C
 
 print("  Computing PDSI with baseline PET (PM-RC)...")
 # For simplified PDSI, we'll use P and EP only (no detailed water balance)
-PDSI_baseline = pdsi_calculator.compute(
+# compute() returns (Z, PDSI), we only need PDSI
+Z_baseline, PDSI_baseline = pdsi_calculator.compute(
     P=P_monthly,
     EP=EP_baseline,
     E=None,  # Use simplified mode
@@ -682,7 +684,7 @@ PDSI_baseline = pdsi_calculator.compute(
 )
 
 print("  Computing PDSI with adjusted PET (PM-Jarvis)...")
-PDSI_adjusted = pdsi_calculator.compute(
+Z_adjusted, PDSI_adjusted = pdsi_calculator.compute(
     P=P_monthly,
     EP=EP_adjusted,
     E=None,

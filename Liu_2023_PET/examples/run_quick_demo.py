@@ -1,6 +1,11 @@
+import sys
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+# Add the src directory to the path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from ep_veg import (
     ep_pm_rc, ep_yang, ep_veg,
